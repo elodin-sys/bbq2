@@ -82,6 +82,23 @@ impl<S: Storage, C: Coord, N: Notifier> crate::queue::ArcBBQueue<S, C, N> {
         }
     }
 
+    pub fn framed_split<H: LenHeader>(
+        self,
+    ) -> (
+        FramedConsumer<std::sync::Arc<BBQueue<S, C, N>>, S, C, N, H>,
+        FramedProducer<std::sync::Arc<BBQueue<S, C, N>>, S, C, N, H>,
+    ) {
+        (
+            FramedConsumer {
+                bbq: self.0.bbq_ref(),
+                pd: PhantomData,
+            },
+            FramedProducer {
+                bbq: self.0.bbq_ref(),
+                pd: PhantomData,
+            },
+        )
+    }
 }
 
 pub struct FramedProducer<Q, S, C, N, H = u16>
