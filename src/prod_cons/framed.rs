@@ -81,6 +81,7 @@ impl<S: Storage, C: Coord, N: Notifier> crate::queue::ArcBBQueue<S, C, N> {
             pd: PhantomData,
         }
     }
+
 }
 
 pub struct FramedProducer<Q, S, C, N, H = u16>
@@ -223,6 +224,17 @@ where
     hdr: H,
 }
 
+unsafe impl<Q, S, C, N, H> Send for FramedGrantW<Q, S, C, N, H>
+where
+    S: Storage,
+    C: Coord,
+    N: Notifier,
+    Q: BbqHandle<S, C, N>,
+    Q::Target: Send,
+    H: LenHeader + Send,
+{
+}
+
 impl<Q, S, C, N, H> Deref for FramedGrantW<Q, S, C, N, H>
 where
     S: Storage,
@@ -322,6 +334,17 @@ where
     bbq: Q::Target,
     body_ptr: NonNull<u8>,
     hdr: H,
+}
+
+unsafe impl<Q, S, C, N, H> Send for FramedGrantR<Q, S, C, N, H>
+where
+    S: Storage,
+    C: Coord,
+    N: Notifier,
+    Q: BbqHandle<S, C, N>,
+    Q::Target: Send,
+    H: LenHeader + Send,
+{
 }
 
 impl<Q, S, C, N, H> Deref for FramedGrantR<Q, S, C, N, H>
